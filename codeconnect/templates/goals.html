@@ -61,6 +61,9 @@
           <li><a href="/chat">Chat</a></li>
           <li><a href="/goals">Goals</a></li>
           <li><a href="/leaderboard">Leaderboard</a></li>
+          {% if is_admin_user() %}
+          <li><a href="/admin/users">Admin Panel</a></li>
+          {% endif %}
         </ul>
       </div>
     </div>
@@ -162,42 +165,65 @@
 </div>
 
 <div class="flex min-h-screen max-w-7xl mx-auto">
-  <div class="w-96 z-2 fixed p-6 overflow-y-auto 
-            bottom-0 left-1/2 translate-x-[-50%] 
-            lg:top-16 lg:bottom-0 lg:left-auto lg:translate-x-0">
+ <!-- Toggle Button -->
+<button id="toggle-widget" class="fixed bottom-4 right-4 btn btn-primary z-50">
+  Open Goal Widget
+</button>
 
+<!-- Widget Container -->
+<div id="goal-widget" class="w-96 z-40 fixed p-6 overflow-y-auto 
+            bottom-1/2 left-1/2 translate-x-[-50%] translate-y-[50%] 
+            lg:top-16 lg:bottom-0 lg:left-auto lg:translate-x-0 lg:translate-y-0 hidden">
 
-    <div class="card bg-base-200 shadow-lg sticky top-6">
-      <div class="card-body space-y-4">
+  <div class="card bg-base-200 shadow-lg sticky top-6">
+    <div class="card-body space-y-4">
+      <div class="flex justify-between items-center">
         <h2 class="card-title text-lg">Set a New Goal</h2>
-        <input id="goal-title" type="text" placeholder="Goal Title" class="input input-bordered w-full" />
-        <div class="form-control flex flex-col gap-2">
-          <label class="label cursor-pointer">
-            <input type="radio" name="difficulty" value="easy" class="radio radio-success" checked onclick="selectDifficulty('easy')" />
-            <span class="label-text text-success flex items-center justify-center gap-1">Easy - 100 <img src="/static/images/money-icon.png" alt="currency icon" class="inline-block w-6 h-6" /></span>
-          </label>
-          <label class="label cursor-pointer">
-            <input type="radio" name="difficulty" value="medium" class="radio radio-warning" onclick="selectDifficulty('medium')" />
-            <span class="label-text text-warning flex items-center justify-center gap-1">Medium - 250 <img src="/static/images/money-icon.png" alt="currency icon" class="inline-block w-6 h-6" /></span>
-          </label>
-          <label class="label cursor-pointer">
-            <input type="radio" name="difficulty" value="hard" class="radio radio-error" onclick="selectDifficulty('hard')" />
-            <span class="label-text text-error flex items-center justify-center gap-1">Hard - 500 <img src="/static/images/money-icon.png" alt="currency icon" class="inline-block w-6 h-6" /></span>
-          </label>
-        </div>
-        <input type="hidden" id="difficulty-value" value="easy" />
-        <textarea class="textarea textarea-bordered w-full" placeholder="Goal Description"></textarea>
-        <div class="card-actions justify-end">
-          <button onclick="addGoal()" class="btn btn-info w-full">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-            </svg>
-            Add Goal
-          </button>
-        </div>
+        <button onclick="toggleWidget()" class="btn btn-sm btn-ghost text-error">✖</button>
+      </div>
+
+      <input id="goal-title" type="text" placeholder="Goal Title" class="input input-bordered w-full" />
+      <div class="form-control flex flex-col gap-2">
+        <label class="label cursor-pointer">
+          <input type="radio" name="difficulty" value="easy" class="radio radio-success" checked onclick="selectDifficulty('easy')" />
+          <span class="label-text text-success flex items-center justify-center gap-1">Easy - 100 <img src="/static/images/money-icon.png" alt="currency icon" class="inline-block w-6 h-6" /></span>
+        </label>
+        <label class="label cursor-pointer">
+          <input type="radio" name="difficulty" value="medium" class="radio radio-warning" onclick="selectDifficulty('medium')" />
+          <span class="label-text text-warning flex items-center justify-center gap-1">Medium - 250 <img src="/static/images/money-icon.png" alt="currency icon" class="inline-block w-6 h-6" /></span>
+        </label>
+        <label class="label cursor-pointer">
+          <input type="radio" name="difficulty" value="hard" class="radio radio-error" onclick="selectDifficulty('hard')" />
+          <span class="label-text text-error flex items-center justify-center gap-1">Hard - 500 <img src="/static/images/money-icon.png" alt="currency icon" class="inline-block w-6 h-6" /></span>
+        </label>
+      </div>
+      <input type="hidden" id="difficulty-value" value="easy" />
+      <textarea class="textarea textarea-bordered w-full" placeholder="Goal Description"></textarea>
+      <div class="card-actions justify-end">
+        <button onclick="addGoal()" class="btn btn-info w-full">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+          </svg>
+          Add Goal
+        </button>
       </div>
     </div>
   </div>
+</div>
+
+<!-- Script to Toggle -->
+<script>
+  const widget = document.getElementById("goal-widget");
+  const toggleBtn = document.getElementById("toggle-widget");
+
+  function toggleWidget() {
+    widget.classList.toggle("hidden");
+    toggleBtn.textContent = widget.classList.contains("hidden") ? "Open Goal Widget" : "Close Goal Widget";
+  }
+
+  toggleBtn.addEventListener("click", toggleWidget);
+</script>
+
 
   <div class="lg:ml-96 mt-24 w-full p-6 overflow-y-auto">
     <h2 class="text-xl font-semibold mb-4">

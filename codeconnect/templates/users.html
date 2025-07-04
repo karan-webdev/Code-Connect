@@ -28,6 +28,9 @@
           <li><a href="/chat">Chat</a></li>
           <li><a href="/goals">Goals</a></li>
           <li><a href="/leaderboard">Leaderboard</a></li>
+          {% if is_admin_user() %}
+          <li><a href="/admin/users">Admin Panel</a></li>
+          {% endif %}
         </ul>
       </div>
     </div>
@@ -132,7 +135,7 @@
   {% if messages %}
     <div role="alert">
       {% for category, message in messages %}
-        <div id="flash-message" class="alert transition-opacity duration-1000 opacity-100
+        <div id="flash-message" class="mt-[64px] alert transition-opacity duration-1000 opacity-100
                     {% if category == 'success' %}
                       alert-success
                     {% elif category == 'warning' %}

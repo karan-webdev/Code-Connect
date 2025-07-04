@@ -204,6 +204,9 @@
           <li><a href="/chat">Chat</a></li>
           <li><a href="/goals">Goals</a></li>
           <li><a href="/leaderboard">Leaderboard</a></li>
+          {% if is_admin_user() %}
+          <li><a href="/admin/users">Admin Panel</a></li>
+          {% endif %}
         </ul>
       </div>
     </div>
@@ -464,12 +467,12 @@ function RemoveFriend(friendId) {
           window.location.href = '/chat';
         }
       } else {
-        alert('Error removing friend: ' + (data.error || 'Unknown error'));
+        // alert('Error removing friend: ' + (data.error || 'Unknown error'));
       }
     })
     .catch(error => {
       console.error('Error removing friend:', error);
-      alert('Error removing friend');
+      // alert('Error removing friend');
     });
 }
 
@@ -488,12 +491,12 @@ function leaveGroup(groupId) {
           window.location.href = '/chat';
         }
       } else {
-        alert('Error leaving group: ' + (data.error || 'Unknown error'));
+        // alert('Error leaving group: ' + (data.error || 'Unknown error'));
       }
     })
     .catch(error => {
       console.error('Error leaving group:', error);
-      alert('Error leaving group');
+      // alert('Error leaving group');
     });
 }
 
@@ -515,12 +518,12 @@ function renameGroup(groupId) {
             document.querySelector('#conversation .text-center h2').textContent = newName.trim();
           }
         } else {
-          alert('Error renaming group: ' + (data.error || 'Unknown error'));
+          // alert('Error renaming group: ' + (data.error || 'Unknown error'));
         }
       })
       .catch(error => {
         console.error('Error renaming group:', error);
-        alert('Error renaming group');
+        // alert('Error renaming group');
       });
   }
 }
@@ -539,12 +542,12 @@ function toggleAccountabilityPartner(friendId) {
         fetchFriendSuggestions();
         alert(`Accountability partner status ${data.is_now_partner ? 'added' : 'removed'} successfully`);
       } else {
-        alert('Error toggling accountability partner: ' + (data.error || 'Unknown error'));
+        // alert('Error toggling accountability partner: ' + (data.error || 'Unknown error'));
       }
     })
     .catch(error => {
       console.error('Error toggling accountability partner:', error);
-      alert('Error toggling accountability partner');
+      // alert('Error toggling accountability partner');
     });
 }
 
@@ -595,12 +598,12 @@ function sendFriendSuggestionRequest(userId) {
         fetchRecentMessages();
         alert(data.message);
       } else {
-        alert(data.error || 'Error sending friend request');
+        // alert(data.error || 'Error sending friend request');
       }
     })
     .catch(error => {
       console.error('Error sending friend request:', error);
-      alert('Error sending friend request');
+      // alert('Error sending friend request');
     });
 }
 
@@ -616,12 +619,12 @@ function removeFriendSuggestion(userId) {
       if (data.success) {
         fetchFriendSuggestions();
       } else {
-        alert(data.error || 'Error removing friend suggestion');
+        // alert(data.error || 'Error removing friend suggestion');
       }
     })
     .catch(error => {
       console.error('Error removing friend suggestion:', error);
-      alert('Error removing friend suggestion');
+      // alert('Error removing friend suggestion');
     });
 }
 
@@ -1053,12 +1056,12 @@ document.addEventListener('DOMContentLoaded', function () {
             document.getElementById('create-group-modal').close();
             alert('Group created successfully!');
           } else {
-            alert('Error creating group: ' + (data.error || 'Unknown error'));
+            // alert('Error creating group: ' + (data.error || 'Unknown error'));
           }
         })
         .catch(error => {
           console.error('Error creating group:', error);
-          alert('Error creating group');
+          // alert('Error creating group');
         });
     });
   }
@@ -1098,12 +1101,12 @@ document.addEventListener('DOMContentLoaded', function () {
             previewContainer.innerHTML = "";
           } else {
             console.error('Error sending message:', data.error);
-            alert('Failed to send message: ' + data.error);
+            // alert('Failed to send message: ' + data.error);
           }
         })
         .catch(error => {
           console.error('Error:', error);
-          alert('Error sending message');
+          // alert('Error sending message');
         });
     }
 

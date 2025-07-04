@@ -10,13 +10,12 @@
   <link href="https://cdn.jsdelivr.net/npm/daisyui@5/themes.css" rel="stylesheet" type="text/css" />
 </head>
 <body class="min-h-screen flex flex-col">
-    
 
 {% with messages = get_flashed_messages(with_categories=true) %}
   {% if messages %}
     <div role="alert">
       {% for category, message in messages %}
-        <div id="flash-message" class="alert transition-opacity duration-1000 opacity-100
+        <div id="flash-message" class="mt-[64px] alert transition-opacity duration-1000 opacity-100
                     {% if category == 'success' %}
                       alert-success
                     {% elif category == 'warning' %}
@@ -50,10 +49,6 @@
   {% endif %}
 {% endwith %}
 
-
-
-
-
 <div class="navbar bg-base-100 shadow-sm fixed z-100">
   <div class="navbar-start">
     <div class="drawer">
@@ -72,6 +67,9 @@
           <li><a href="/chat">Chat</a></li>
           <li><a href="/goals">Goals</a></li>
           <li><a href="/leaderboard">Leaderboard</a></li>
+          {% if is_admin_user() %}
+          <li><a href="/admin/users">Admin Panel</a></li>
+          {% endif %}
         </ul>
       </div>
     </div>
@@ -146,20 +144,20 @@
         </div>
       </div>
       <div class="dropdown lg:dropdown-center dropdown-end">
-        <div role="button" tabindex="0"  class="flex px-2 items-center justify-center btn btn-ghost">
-        <div class="btn btn-ghost btn-circle avatar">
-          <div class="w-10 rounded-full">
-            <img alt="Profile photo" src="{{ current_user.profile_photo }}" />
+        <div role="button" tabindex="0" class="flex px-2 items-center justify-center btn btn-ghost">
+          <div class="btn btn-ghost btn-circle avatar">
+            <div class="w-10 rounded-full">
+              <img alt="Profile photo" src="{{ current_user.profile_photo }}" />
+            </div>
           </div>
-        </div>
-        <span id="points-display" class="text-lg font-semibold lg:block hidden">{{ points }}</span>
-        <img src="/static/images/money-icon.png" alt="currency icon" class="lg:inline-block hidden w-8 h-8" />
+          <span id="points-display" class="text-lg font-semibold lg:block hidden">{{ points }}</span>
+          <img src="/static/images/money-icon.png" alt="currency icon" class="lg:inline-block hidden w-8 h-8" />
         </div>
         <ul tabindex="0" class="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-40 p-2 shadow">
           <li class="lg:hidden block">
             <div class="gap-1">
-             <span id="points-display" class="font-semibold inline-block lg:hidden">{{ points }}</span>
-            <img src="/static/images/money-icon.png" alt="currency icon" class="inline-block lg:hidden w-6 h-6" />
+              <span id="points-display" class="font-semibold inline-block lg:hidden">{{ points }}</span>
+              <img src="/static/images/money-icon.png" alt="currency icon" class="inline-block lg:hidden w-6 h-6" />
             </div>
           </li>
           <li><a href="/profile" class="justify-between">Profile</a></li>
@@ -174,8 +172,8 @@
 
 {% if 'user_email' in session %}
   <!-- Content for logged-in users -->
-   <div class="flex-1 flex justify-center items-center">
-  <h1 class="text-4xl">Welcome, {{ session['user_name'] }}!</h1>
+  <div class="flex-1 flex justify-center items-center">
+    <h1 class="text-4xl">Welcome, {{ session['user_name'] }}!</h1>
   </div>
 {% else %}
   <!-- Content for users who are not logged in -->
@@ -184,86 +182,70 @@
   </div>
 {% endif %}
 
-
-
-
-
-
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
 
 <script>
-
   document.addEventListener('DOMContentLoaded', function () {
-  const flash = document.getElementById('flash-message');
-
-  if (flash) {
-    setTimeout(() => {
-      flash.classList.add('opacity-0'); // fade out using Tailwind class
-
-      // Wait for transition to finish before removing from DOM
+    const flash = document.getElementById('flash-message');
+    if (flash) {
       setTimeout(() => {
-        flash.remove();
-      }, 1000); // match `duration-1000`
-    }, 3000); // wait 3 seconds before fading
-  }
-  });
+        flash.classList.add('opacity-0');
+        setTimeout(() => flash.remove(), 1000);
+      }, 3000);
+    }
 
+    {% if clear_form_state %}
+        sessionStorage.removeItem('formState');
+        $("#form-container").html(''); // Clear form container
+    {% endif %}
 
-  const loginForm = `
-  <form method="POST" action="/login">
-    <fieldset class="fieldset bg-base-200 border-base-300 rounded-box border p-4">
-      <legend class="fieldset-legend">Login</legend>
+    const loginForm = `
+      <form method="POST" action="/login">
+        <fieldset class="fieldset bg-base-200 border-base-300 rounded-box border p-4">
+          <legend class="fieldset-legend">Login</legend>
+          <label class="label">Email</label>
+          <input type="email" name="email" class="input validator w-full" placeholder="Email" />
+          <label class="label">Password</label>
+          <input type="password" name="password" class="input w-full" placeholder="Password" />
+          <p class="text-center cursor-pointer text-sm mt-2 toggle-form">Don't have an account?</p>
+          <button type="submit" class="btn btn-neutral w-full mt-4">Login</button>
+        </fieldset>
+      </form>
+    `;
 
-      <label class="label">Email</label>
-      <input type="email" name='email' class="input validator w-full" placeholder="Email" />
+    const signupForm = `
+      <form method="POST" action="/signup">
+        <fieldset class="fieldset bg-base-200 border-base-300 rounded-box border p-4">
+          <legend class="fieldset-legend">Sign Up</legend>
+          <label class="label">Name</label>
+          <input type="text" name="name" class="input w-full" placeholder="Full Name" />
+          <label class="label">Email</label>
+          <input type="email" name="email" class="input validator w-full" placeholder="Email" />
+          <label class="label">Password</label>
+          <input type="password" name="password" class="input w-full" placeholder="Password" />
+          <label class="label">Confirm password</label>
+          <input type="password" name="confirm_password" class="input w-full" placeholder="Re-type password" />
+          <p class="text-center cursor-pointer text-sm mt-2 toggle-form">Already have an account?</p>
+          <button type="submit" class="btn btn-neutral w-full mt-4">Sign Up</button>
+        </fieldset>
+      </form>
+    `;
 
-      <label class="label">Password</label>
-      <input type="password" name='password' class="input w-full" placeholder="Password" />
+    // Load form state from sessionStorage or default to login
+    const savedFormState = sessionStorage.getItem('formState') || 'login';
+    $("#form-container").html(savedFormState === 'signup' ? signupForm : loginForm);
 
-      <p class="text-center cursor-pointer text-sm mt-2 toggle-form">Don't have an account?</p>
-
-      <button type="submit" class="btn btn-neutral w-full mt-4">Login</button>
-    </fieldset>
-    </form>
-  `;
-
-  const signupForm = `
-  <form method="POST" action="/signup">
-    <fieldset class="fieldset bg-base-200 border-base-300 rounded-box border p-4">
-      <legend class="fieldset-legend">Sign Up</legend>
-
-      <label class="label">Name</label>
-      <input type="text" name='name' class="input w-full" placeholder="Full Name" />
-
-      <label  class="label">Email</label>
-      <input type="email" name='email' class="input validator w-full" placeholder="Email" />
-
-      <label class="label">Password</label>
-      <input type="password" name='password' class="input w-full" placeholder="Password" />
-
-      
-
-      <label class="label">Confirm password</label>
-      <input type="password" class="input w-full" placeholder="Re-type password" />
-
-      <p class="text-center cursor-pointer text-sm mt-2 toggle-form">Already have an account?</p>
-
-      <button type="submit" class="btn btn-neutral w-full mt-4">Sign Up</button>
-    </fieldset>
-    <form>
-  `;
-
-  // Initial form
-  $("#form-container").html(loginForm);
-
-  // Toggle logic
-  $(document).on("click", ".toggle-form", function () {
-    const isLogin = $(this).text().includes("Don't have");
-    $("#form-container").html(isLogin ? signupForm : loginForm);
+    // Toggle logic with sessionStorage
+    $(document).on("click", ".toggle-form", function () {
+        const isLogin = $(this).text().includes("Don't have");
+        $("#form-container").html(isLogin ? signupForm : loginForm);
+        // Save form state to sessionStorage
+        sessionStorage.setItem('formState', isLogin ? 'signup' : 'login');
+    });
   });
 </script>
-<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+
 <script>
 function deleteMessage(messageId) {
   fetch(`/delete_message/${messageId}`, {
